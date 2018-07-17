@@ -12,7 +12,7 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteY="68dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,19 +24,19 @@
                 android:layout_height="208dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="43dp"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:text="Device Info" />
-
                 <View
                     android:id="@+id/divider"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:text="Device Info" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -52,7 +52,7 @@
                         android:text="Device name" />
 
                     <EditText
-                        android:id="@+id/txt_Name_Device"
+                        android:id="@+id/dn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -76,7 +76,7 @@
                         android:text="Device model" />
 
                     <EditText
-                        android:id="@+id/editText5"
+                        android:id="@+id/dm"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -93,14 +93,14 @@
 
                     <TextView
                         android:id="@+id/textView9"
-                        android:layout_width="84dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:layout_weight="1"
                         android:text="Android version" />
 
                     <EditText
-                        android:id="@+id/editText4"
+                        android:id="@+id/dv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -117,7 +117,7 @@
                     <TextView
                         android:id="@+id/txt_debit"
                         android:layout_width="wrap_content"
-                        android:layout_height="34dp"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:layout_weight="1"
                         android:gravity="center_vertical|center_horizontal"

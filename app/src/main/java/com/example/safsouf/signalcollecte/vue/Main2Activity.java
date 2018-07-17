@@ -1,6 +1,7 @@
 package com.example.safsouf.signalcollecte.vue;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -28,6 +29,9 @@ public class Main2Activity extends AppCompatActivity {
     EditText rssi;
     EditText cqi;
     EditText SS;
+    EditText  dn;
+    EditText  dm;
+    EditText  dv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,9 @@ public class Main2Activity extends AppCompatActivity {
         rssi= (EditText) findViewById(R.id.rssi);
         cqi = (EditText) findViewById(R.id.cqi);
         SS = (EditText) findViewById(R.id.ss);
+       dn = (EditText) findViewById(R.id.dn);
+       dm= (EditText) findViewById(R.id.dm);
+        dv = (EditText) findViewById(R.id.dv);
 
         /*cd= new ConnectionDetector( this );
            if(cd.isConnected()){
@@ -70,7 +77,6 @@ public class Main2Activity extends AppCompatActivity {
                 txt_etat.setText("Not conected to LTE");
                 }
 
-
             // For Lte SignalStrength: dbm = ASU - 140.
             //Log.d("signalStrength----->", String.valueOf(mSignalStrength));
            //SS.setText(String.valueOf(mSignalStrength));
@@ -95,6 +101,19 @@ public class Main2Activity extends AppCompatActivity {
             cqiLTE = Integer.parseInt(parts[12])-140;
             cqi.setText(String.valueOf(cqiLTE));
 
-        }
+
+
+            //String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
+            // dn.setText(String.valueOf(deviceName));
+            //Device name
+
+            String manufacturer = Build.MANUFACTURER;
+            dn.setText(String.valueOf(manufacturer));
+            Log.d("name----->", String.valueOf( manufacturer));
+            //Device model
+            String model = Build.MODEL;
+            dm.setText(String.valueOf(model));
+            Log.d("model----->", String.valueOf( model));
+            }
     }}
 

@@ -23,7 +23,6 @@ public class Main2Activity extends AppCompatActivity {
     int speedMbps;
     ConnectionDetector cd;
     Debit db;
-
     EditText  rsrp;
     EditText rsrq;
     EditText rssi;
@@ -55,6 +54,20 @@ public class Main2Activity extends AppCompatActivity {
         mPhoneStatelistener = new MyPhoneStateListener();
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTelephonyManager.listen(mPhoneStatelistener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+
+        //Device name
+        String manufacturer = Build.MANUFACTURER;
+        dn.setText(String.valueOf(manufacturer));
+        Log.d("name----->", String.valueOf( manufacturer));
+        //Device model
+        String model = Build.MODEL;
+        dm.setText(String.valueOf(model));
+        Log.d("model----->", String.valueOf( model));
+
+        // Device version
+        String version = Build.VERSION.RELEASE;
+        dv.setText(String.valueOf(version));
+        Log.d("version----->", String.valueOf( version));
         }
 
     class MyPhoneStateListener extends PhoneStateListener {
@@ -101,19 +114,7 @@ public class Main2Activity extends AppCompatActivity {
             cqiLTE = Integer.parseInt(parts[12])-140;
             cqi.setText(String.valueOf(cqiLTE));
 
-
-
-            //String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
-            // dn.setText(String.valueOf(deviceName));
-            //Device name
-
-            String manufacturer = Build.MANUFACTURER;
-            dn.setText(String.valueOf(manufacturer));
-            Log.d("name----->", String.valueOf( manufacturer));
-            //Device model
-            String model = Build.MODEL;
-            dm.setText(String.valueOf(model));
-            Log.d("model----->", String.valueOf( model));
             }
+
     }}
 

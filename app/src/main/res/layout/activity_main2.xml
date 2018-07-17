@@ -152,7 +152,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|center_horizontal"
-                    android:text="LTE(4G) " />
+                    android:text="LTE mesurement(dbm) " />
 
                 <View
                     android:id="@+id/divider3"
@@ -176,7 +176,7 @@
                         android:text="LTE RSRP signal" />
 
                     <EditText
-                        android:id="@+id/editText13"
+                        android:id="@+id/rsrp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -201,7 +201,7 @@
                         android:text="LTE RSSI signal" />
 
                     <EditText
-                        android:id="@+id/editText12"
+                        android:id="@+id/rssi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -226,7 +226,7 @@
                         android:text="LTE RSRQ signal" />
 
                     <EditText
-                        android:id="@+id/editText11"
+                        android:id="@+id/rsrq"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -248,10 +248,10 @@
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:layout_weight="1"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="LTE SNR signal" />
+                        android:text="LTE signal strength" />
 
                     <EditText
-                        android:id="@+id/editText10"
+                        android:id="@+id/ss"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
@@ -276,7 +276,7 @@
                         android:text="LTE CQI signal" />
 
                     <EditText
-                        android:id="@+id/editText9"
+                        android:id="@+id/cqi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"

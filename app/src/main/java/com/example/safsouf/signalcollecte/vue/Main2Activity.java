@@ -1,40 +1,100 @@
 package com.example.safsouf.signalcollecte.vue;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
-
 import com.example.safsouf.signalcollecte.R;
 import com.example.safsouf.signalcollecte.modele.ConnectionDetector;
 import com.example.safsouf.signalcollecte.modele.Debit;
 
 public class Main2Activity extends AppCompatActivity {
 
+    TelephonyManager mTelephonyManager;
+    MyPhoneStateListener mPhoneStatelistener;
+    String mSignalStrength = "";
     EditText txt_etat;
-EditText txt_Name_Device;
-int speedMbps;
+    EditText txt_Name_Device;
+    int speedMbps;
     ConnectionDetector cd;
     Debit db;
+
+    EditText  rsrp;
+    EditText rsrq;
+    EditText rssi;
+    EditText cqi;
+    EditText SS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
         txt_etat=(EditText)findViewById( R.id.txt_etat );
+        rsrp = (EditText) findViewById(R.id.rsrp);
+        rsrq = (EditText) findViewById(R.id.rsrq);
+        rssi= (EditText) findViewById(R.id.rssi);
+        cqi = (EditText) findViewById(R.id.cqi);
+        SS = (EditText) findViewById(R.id.ss);
 
-        cd= new ConnectionDetector( this );
-
-        if(cd.isConnected()){
+        /*cd= new ConnectionDetector( this );
+           if(cd.isConnected()){
             txt_etat.setText("Conected");
-        }else {txt_etat.setText("Not Conected");}
+        }else {txt_etat.setText("Not Conected");}*/
+
+        mPhoneStatelistener = new MyPhoneStateListener();
+        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyManager.listen(mPhoneStatelistener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+        }
+
+    class MyPhoneStateListener extends PhoneStateListener {
+        @Override
+        public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+            super.onSignalStrengthsChanged(signalStrength);
+
+            mSignalStrength = signalStrength.toString();
+            String[] parts = mSignalStrength.split(" ");
+
+            int signalStrengthDbm = 0;
+            int rsrpLTE = 0;
+            int rsrqLTE = 0;
+            int rssnrLTE = 0;
+            int cqiLTE = 0;
+
+            if ( mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_LTE){
+                txt_etat.setText("Conected to LTE");
+                } else {
+                txt_etat.setText("Not conected to LTE");
+                }
 
 
+            // For Lte SignalStrength: dbm = ASU - 140.
+            //Log.d("signalStrength----->", String.valueOf(mSignalStrength));
+           //SS.setText(String.valueOf(mSignalStrength));
 
+            //LteSignalStrength PART 8
+            signalStrengthDbm = Integer.parseInt(parts[8])-140;
+            SS.setText(String.valueOf(signalStrengthDbm));
 
+            //RSRP PART 9
+            rsrpLTE = Integer.parseInt(parts[9])-140;
+            rsrp.setText(String.valueOf(rsrpLTE));
 
+            //RSRQPART 10
+            rsrqLTE = Integer.parseInt(parts[10])-140;
+            rsrq.setText(String.valueOf(rsrqLTE));
 
+            //RSSNR PART 11
+            rssnrLTE = Integer.parseInt(parts[11])-140;
+            rssi.setText(String.valueOf(rssnrLTE));
 
-    }
-}
+            //CQI  PART 12
+            cqiLTE = Integer.parseInt(parts[12])-140;
+            cqi.setText(String.valueOf(cqiLTE));
+
+        }
+    }}
+

@@ -1,30 +1,37 @@
 package com.example.safsouf.signalcollecte.vue;
 
-import android.app.ProgressDialog;
+import android.Manifest;
 import android.content.Context;
-import android.database.Cursor;
-import android.os.Build;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoLte;
 import android.telephony.PhoneStateListener;
-import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
-import android.text.Selection;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.safsouf.signalcollecte.R;
-import com.example.safsouf.signalcollecte.modele.ConnectionDetector;
-import com.example.safsouf.signalcollecte.modele.Debit;
+import com.example.safsouf.signalcollecte.modele.CompleteAddress;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import static android.os.Build.MANUFACTURER;
+import static android.os.Build.MODEL;
+import static android.os.Build.VERSION;
+import static android.os.Build.VERSION_CODES;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -32,58 +39,49 @@ public class Main2Activity extends AppCompatActivity {
     MyPhoneStateListener mPhoneStatelistener;
     String mSignalStrength = "";
     TextView txt_etat;
-    EditText txt_Name_Device;
-    ConnectionDetector cd;
-    EditText rsrp;
-    EditText rsrq;
-    EditText rssi;
-    EditText cqi;
-    EditText SS;
-    EditText dn;
-    EditText dm;
-    EditText dv;
 
+    //LTE Info
+    TextView rsrp;
+    TextView rsrq;
+    TextView rssi;
+    TextView cqi;
+    TextView SS;
+
+    //device info
+    TextView dn;
+    TextView dm;
+    TextView dv;
+
+    //Cell info
+    TextView cellIDTextView;
+    TextView cellMccTextView;
+    TextView cellMncTextView;
+    TextView cellPciTextView;
+    TextView cellTacTextView;
+
+    List<CellInfo> cellInfoList;
+    int cellSig, cellID, cellMcc, cellMnc, cellPci, cellTac = 0;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
+
+    @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        txt_etat = (TextView) findViewById(R.id.etat);
-        rsrp = (EditText) findViewById(R.id.rsrp);
-        rsrq = (EditText) findViewById(R.id.rsrq);
-        rssi = (EditText) findViewById(R.id.rssi);
-        cqi = (EditText) findViewById(R.id.cqi);
-        SS = (EditText) findViewById(R.id.ss);
-        dn = (EditText) findViewById(R.id.dn);
-        dm = (EditText) findViewById(R.id.dm);
-        dv = (EditText) findViewById(R.id.dv);
 
-        PhoneStateListener myPhoneStateListener;
-        TelephonyManager tm;
+        initComponent();
 
-        /*cd= new ConnectionDetector( this );
-           if(cd.isConnected()){
-            txt_etat.setText("Conected");
-        }else {txt_etat.setText("Not Conected");}*/
+        initPhoneManager();
 
-        mPhoneStatelistener = new MyPhoneStateListener();
-        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        mTelephonyManager.listen(mPhoneStatelistener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+        getDeviceÌnfo();
 
-        //Device name
-        String manufacturer = Build.MANUFACTURER;
-        dn.setText(String.valueOf(manufacturer));
-        Log.d("name----->", String.valueOf(manufacturer));
-        //Device model
-        String model = Build.MODEL;
-        dm.setText(String.valueOf(model));
-        Log.d("model----->", String.valueOf(model));
+        getCellInfo();
 
-        // Device version
-        String version = Build.VERSION.RELEASE;
-        dv.setText("Android");
-        dv.setText(String.valueOf(version));
-        Log.d("version----->", String.valueOf( version));
-        }
+        getLocation();
+
+    }
 
     class MyPhoneStateListener extends PhoneStateListener {
         @Override
@@ -93,45 +91,173 @@ public class Main2Activity extends AppCompatActivity {
             mSignalStrength = signalStrength.toString();
             String[] parts = mSignalStrength.split(" ");
 
-            int signalStrengthDbm = 0;
-            int rsrpLTE = 0;
-            int rsrqLTE = 0;
-            int rssnrLTE = 0;
-            int cqiLTE = 0;
-
-            if (mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_LTE) {
+            if (mTelephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_LTE)
                 txt_etat.setText("Conected to LTE");
-            } else {
+            else
                 txt_etat.setText("Not conected to LTE");
-            }
-
-            // For Lte SignalStrength: dbm = ASU - 140.
-            //Log.d("signalStrength----->", String.valueOf(mSignalStrength));
-            //SS.setText(String.valueOf(mSignalStrength));
 
             //LteSignalStrength PART 8
-            signalStrengthDbm = Integer.parseInt(parts[8]) - 140;
-            SS.setText(String.valueOf(signalStrengthDbm));
+            SS.setText(convertToDbm(parts[8]));
 
             //RSRP PART 9
-            rsrpLTE = Integer.parseInt(parts[9]) - 140;
-            rsrp.setText(String.valueOf(rsrpLTE));
+            rsrp.setText(convertToDbm(parts[9]));
 
             //RSRQPART 10
-            rsrqLTE = Integer.parseInt(parts[10]) - 140;
-            rsrq.setText(String.valueOf(rsrqLTE));
+            rsrq.setText(convertToDbm(parts[10]));
 
             //RSSNR PART 11
-            rssnrLTE = Integer.parseInt(parts[11]) - 140;
-            rssi.setText(String.valueOf(rssnrLTE));
+            rssi.setText(convertToDbm(parts[11]));
 
             //CQI  PART 12
-            cqiLTE = Integer.parseInt(parts[12]) - 140;
-            cqi.setText(String.valueOf(cqiLTE));
+            cqi.setText(convertToDbm(parts[12]));
         }
-    }}
 
 
+        private String convertToDbm(String value) {
+            return String.valueOf(Integer.parseInt(value) - 140);
+        }
 
 
+        @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
+        @Override
+        public void onCellInfoChanged(List<CellInfo> cellInfoList) {
+            super.onCellInfoChanged(cellInfoList);
+            getCellInfo(cellInfoList);
+        }
+    }
+
+    private void getDeviceÌnfo() {
+        dn.setText(MANUFACTURER);
+        dm.setText(MODEL);
+        dv.setText("Android " + VERSION.RELEASE);
+    }
+
+    //
+    @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
+    public void getCellInfo(List<CellInfo> cellInfoList) {
+        try {
+            for (CellInfo cellInfo : cellInfoList) {
+                if (cellInfo instanceof CellInfoLte) {
+                    // cast to CellInfoLte and call all the CellInfoLte methods you need
+                    // gets RSRP cell signal strength:
+                    cellSig = ((CellInfoLte) cellInfo).getCellSignalStrength().getDbm();
+
+                    // Gets the LTE cell indentity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
+                    cellID = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
+                    cellIDTextView.setText(String.valueOf(cellID));
+                    Log.d("CellID ------->", String.valueOf(cellID)) ;
+
+                    // Gets the LTE MCC: (returns 3-digit Mobile Country Code, 0..999, Integer.MAX_VALUE if unknown)
+                    cellMcc = ((CellInfoLte) cellInfo).getCellIdentity().getMcc();
+                    cellMccTextView.setText(String.valueOf(cellMcc));
+                    Log.d("MCC ------------------>", String.valueOf(cellMcc)) ;
+
+
+                    // Gets theLTE MNC: (returns 2 or 3-digit Mobile Network Code, 0..999, Integer.MAX_VALUE if unknown)
+                    cellMnc = ((CellInfoLte) cellInfo).getCellIdentity().getMnc();
+                    cellMncTextView.setText(String.valueOf(cellMnc));
+
+                    // Gets the LTE PCI: (returns Physical Cell Id 0..503, Integer.MAX_VALUE if unknown)
+                    cellPci = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
+                    cellPciTextView.setText(String.valueOf(cellPci));
+
+                    // Gets the LTE TAC: (returns 16-bit Tracking Area Code, Integer.MAX_VALUE if unknown)
+                    cellTac = ((CellInfoLte) cellInfo).getCellIdentity().getTac();
+                    cellTacTextView.setText(String.valueOf(cellTac));
+
+                }
+
+            }
+        } catch (Exception e) {
+            Log.d("SignalStrength", "++++++++++++++++++++++ null array spot 2: " + e);
+        }
+    }
+
+    @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
+    private void getCellInfo() {
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        try {
+            cellInfoList = mTelephonyManager.getAllCellInfo();
+            getCellInfo(cellInfoList);
+        } catch (Exception e) {
+            Log.d("SignalStrength", "+++++++++++++++++++++++++++++++++++++++++ null array spot 1: " + e);
+        }
+    }
+
+    private void initComponent() {
+        txt_etat = (TextView) findViewById(R.id.state);
+        rsrp = (TextView) findViewById(R.id.rsrp);
+        rsrq = (TextView) findViewById(R.id.rsrq);
+        rssi = (TextView) findViewById(R.id.rssi);
+        cqi = (TextView) findViewById(R.id.cqi);
+        SS = (TextView) findViewById(R.id.ss);
+
+        dn = (TextView) findViewById(R.id.dn);
+        dm = (TextView) findViewById(R.id.dm);
+        dv = (TextView) findViewById(R.id.dv);
+
+        cellIDTextView = (TextView) findViewById(R.id.cellIDTextView);
+        cellMccTextView = (TextView) findViewById(R.id.cellMccTextView);
+        cellMncTextView = (TextView) findViewById(R.id.cellMncTextView);
+        cellPciTextView = (TextView) findViewById(R.id.cellPciTextView);
+        cellTacTextView = (TextView) findViewById(R.id.cellTacTextView);
+    }
+
+    private void initPhoneManager() {
+        mPhoneStatelistener = new MyPhoneStateListener();
+        mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        mTelephonyManager.listen(mPhoneStatelistener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+    }
+
+    private CompleteAddress getCompleteAddress(double longitude, double latitude) throws IOException {
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String city = addresses.get(0).getLocality();
+        String state = addresses.get(0).getAdminArea();
+        String country = addresses.get(0).getCountryName();
+        String postalCode = addresses.get(0).getPostalCode();
+
+        return new CompleteAddress(address, city, state, country, postalCode);
+
+    }
+
+    private void getLocation() {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            try {
+                                CompleteAddress ca = getCompleteAddress(location.getLongitude(), location.getLatitude());
+
+                                Log.d("completeadress---->", ca.toString());
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+    }
+}
 

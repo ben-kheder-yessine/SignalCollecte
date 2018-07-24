@@ -41,7 +41,9 @@ import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 import static android.widget.Toast.*;
 
-public class Main2Activity extends AppCompatActivity {
+public class
+
+Main2Activity extends AppCompatActivity {
 
 
 
@@ -134,25 +136,7 @@ public class Main2Activity extends AppCompatActivity {
             Toast.makeText(Main2Activity.this,"Error saving file",Toast.LENGTH_SHORT).show();}
 
     }
-
-   /* public void save( View view ) {
-        String FILENAME = "Info_Saved.csv";
-        String entry = txt_etat.getText().toString() + "," +
-                rsrp.getText().toString() + "," +
-                rsrq.getText().toString() + "," +
-                cqi.getText().toString() + "," +
-                SS.getText().toString() + "," +
-                dn.getText().toString() + "," +
-                dm.getText().toString() + "," +
-                dv.getText().toString() + "\n";
-        try {
-            FileOutputStream out = openFileOutput( FILENAME, Context.MODE_APPEND );
-            out.write( entry.getBytes() );
-            out.close();
-        } catch( Exception e ) {
-            e.printStackTrace();
-        }
-    }*/
+    
 
     class MyPhoneStateListener extends PhoneStateListener {
         @Override

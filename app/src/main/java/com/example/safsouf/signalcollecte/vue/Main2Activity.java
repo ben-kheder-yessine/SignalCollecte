@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,10 @@ import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.safsouf.signalcollecte.R;
 import com.example.safsouf.signalcollecte.modele.CompleteAddress;
@@ -24,6 +28,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +39,12 @@ import static android.os.Build.MANUFACTURER;
 import static android.os.Build.MODEL;
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
+import static android.widget.Toast.*;
 
 public class Main2Activity extends AppCompatActivity {
+
+
+
 
     TelephonyManager mTelephonyManager;
     MyPhoneStateListener mPhoneStatelistener;
@@ -52,6 +63,8 @@ public class Main2Activity extends AppCompatActivity {
     TextView dm;
     TextView dv;
 
+    Button btn_save;
+
     //Cell info
     TextView cellIDTextView;
     TextView cellMccTextView;
@@ -59,11 +72,14 @@ public class Main2Activity extends AppCompatActivity {
     TextView cellPciTextView;
     TextView cellTacTextView;
 
+    View view;
+
     List<CellInfo> cellInfoList;
     int cellSig, cellID, cellMcc, cellMnc, cellPci, cellTac = 0;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
+    String fileName = "InfoSave.csv";
 
     @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -72,16 +88,71 @@ public class Main2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
 
         initComponent();
-
         initPhoneManager();
-
         getDeviceÌnfo();
-
         getCellInfo();
-
         getLocation();
 
+        btn_save = (Button) findViewById(R.id.button2);
+
+
+        btn_save.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View pView) {
+                try {
+                    saveFile( fileName);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
+
+    public void saveFile(String file){
+
+        String fileName ="InfoSave.csv";
+        String data = txt_etat.getText().toString() + "," +
+                rsrp.getText().toString() + "," +
+                rsrq.getText().toString() + "," +
+                cqi.getText().toString() + "," +
+                SS.getText().toString() + "," +
+                dn.getText().toString() + "," +
+                dm.getText().toString() + "," +
+                dv.getText().toString() +
+                cellIDTextView.getText().toString()+","+
+                cellMccTextView.getText().toString()+","+
+                cellMncTextView.getText().toString()+","+
+                cellPciTextView.getText().toString()+","+
+                cellTacTextView.getText().toString()+"\n";
+        try{
+            FileOutputStream fos = openFileOutput( file, Context.MODE_PRIVATE);
+            fos.write(data.getBytes());
+            fos.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(Main2Activity.this,"Error saving file",Toast.LENGTH_SHORT).show();}
+
+    }
+
+   /* public void save( View view ) {
+        String FILENAME = "Info_Saved.csv";
+        String entry = txt_etat.getText().toString() + "," +
+                rsrp.getText().toString() + "," +
+                rsrq.getText().toString() + "," +
+                cqi.getText().toString() + "," +
+                SS.getText().toString() + "," +
+                dn.getText().toString() + "," +
+                dm.getText().toString() + "," +
+                dv.getText().toString() + "\n";
+        try {
+            FileOutputStream out = openFileOutput( FILENAME, Context.MODE_APPEND );
+            out.write( entry.getBytes() );
+            out.close();
+        } catch( Exception e ) {
+            e.printStackTrace();
+        }
+    }*/
 
     class MyPhoneStateListener extends PhoneStateListener {
         @Override
@@ -200,6 +271,8 @@ public class Main2Activity extends AppCompatActivity {
         rssi = (TextView) findViewById(R.id.rssi);
         cqi = (TextView) findViewById(R.id.cqi);
         SS = (TextView) findViewById(R.id.ss);
+
+        btn_save = (Button) findViewById(R.id.button2);
 
         dn = (TextView) findViewById(R.id.dn);
         dm = (TextView) findViewById(R.id.dm);

@@ -10,7 +10,7 @@
         android:layout_width="376dp"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="253dp">
+        tools:layout_editor_absoluteY="35dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -118,6 +118,14 @@
                     </LinearLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
+
+            <TextView
+                android:id="@+id/cellTacTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="TextView"
+                android:textColor="@color/colorPrimary" />
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
@@ -375,13 +383,6 @@
                                 android:textColor="@color/colorPrimary"
                                 android:textIsSelectable="true" />
 
-                            <TextView
-                                android:id="@+id/cellTacTextView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="5dp"
-                                android:text="TextView"
-                                android:textColor="@color/colorPrimary" />
                         </LinearLayout>
 
                     </LinearLayout>
